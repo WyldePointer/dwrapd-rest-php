@@ -35,6 +35,7 @@ $limit = 0;
 $limit_index = 0;
 $lookup_result = NULL;
 $ip_array = array();
+$mx_array = array();
 
 $url = url_to_array();
 
@@ -46,7 +47,7 @@ if (!isset($url[1])){
   return -2;
 }
 
-if (!is_valid_domain_name($url[1])){
+if (!dwrapd_is_valid_domain_name($url[1])){
   return -2;
 }
 
@@ -104,6 +105,42 @@ if ($url[0] == "get_ip_by_name"){
 
       foreach ($ip_array as $ip){
         echo $ip, "\n";
+      }
+
+    }
+
+  }
+
+}
+
+if ($url[0] == "get_mx"){
+
+  $lookup_result = dwrapd_do_dns_lookup_mx($url[1]);
+
+  if (is_array($lookup_result)){
+
+    foreach ($lookup_result as $record => $weight){
+
+      $mx_array[$record] = $weight;
+
+      if (count($mx_array) >= $limit && $limit > 0){
+        break;
+      }
+
+    }
+
+    if (count($mx_array)){
+
+      if ($json){
+
+        echo json_encode($mx_array);
+
+      } else {
+
+        foreach ($mx_array as $record => $weight){
+          echo $record, ' ', $weight, "\n";
+        }
+
       }
 
     }

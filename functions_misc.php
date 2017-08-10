@@ -47,11 +47,4 @@ function url_to_array(){
 }
 
 
-function is_valid_domain_name($domain){
 
-  if (strlen($domain) > 253){
-    return false;
-  }
-
-  return preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain);
-}

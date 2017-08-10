@@ -26,12 +26,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+function dwrapd_is_valid_domain_name($hostname){
+
+  if (strlen($hostname) > 253){
+    return false;
+  }
+
+  return preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $hostname);
+}
+
+
 function dwrapd_do_dns_lookup($hostname, $record='A'){
 
   $result = array();
   $php_record_type = DNS_A;
 
-  if ($hostname == ''){
+  if (empty($hostname)){
     return -1;
   }
 
@@ -96,12 +106,7 @@ function dwrapd_do_dns_lookup_mx($hostname){
   $weights = array();
   $formatted = array();
 
-  /*
-   *  TODO: Finding the most address-friendly regex
-   *        and using it instead of doing the actual lookup.
-   */
-
-  if(!filter_var(dwrapd_do_dns_lookup_a($hostname, 1), FILTER_VALIDATE_IP)){
+  if (!dwrapd_is_valid_domain_name($hostname)){
     return -1;
   }
 
@@ -111,28 +116,29 @@ function dwrapd_do_dns_lookup_mx($hostname){
 
       foreach ($weights as $key => $value){
 
-        /*
-         *  TODO: Making sure the returned address is not spoofed.
-         *        (e,g. it's a valid record)
-         */
+        if (dwrapd_is_valid_domain_name($mx_records[$key])){
 
-        if (isset($mx_records[$key])){
-          $formatted[$value] = $mx_records[$key];
+          if (isset($mx_records[$key])){
+            $formatted[$mx_records[$key]] = $value;
+          }
+
         }
 
       }
 
-      if (count($formatted)>0){
+      if (count($formatted)){
         return $formatted;
       }
 
     }
 
-    return $mx_records;
+    if (count($mx_records)){
+      return $mx_records;
+    }
   }
 
 
-  return 0;
+  return false;
 }
 
 
