@@ -4,10 +4,10 @@ A RESTful implementation of dwrapd in PHP.
 You can use https://github.com/WyldePointer/libdwrap-php to query this server.
 <br /><br />
 
-### Production:
+### Using a webserver
 Just put the `.php` files in your `public_html/` or `htdocs/` directory.
 
-### Testing / Development
+### Standalone
 ```
 $ cd dwrapd-rest-php
 $ php -S localhost:8000 index.php
@@ -22,4 +22,6 @@ GET http://localhost:8000/get_ip_by_name/www.google.com/json/limit/2
 ```
 
 #### TODO
+ - Input valiation / sanitization.
  - MX & TXT records.
+
