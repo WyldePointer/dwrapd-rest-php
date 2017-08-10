@@ -46,6 +46,10 @@ if (!isset($url[1])){
   return -2;
 }
 
+if (!is_valid_domain_name($url[1])){
+  return -2;
+}
+
 $json = array_search("json", $url);
 
 $limit_index = array_search("limit", $url);
@@ -108,3 +112,4 @@ if ($url[0] == "get_ip_by_name"){
 
 }
 
+return true;
