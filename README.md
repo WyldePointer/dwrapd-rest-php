@@ -53,7 +53,7 @@ Disable the caching:
 
 `$redis_caching_enabled = false;`
 
-Setting the caching timeout(expire):
+Setting the TTL for the cached records:
 
 `$redis_caching_ttl = 10;` (in seconds)
 
@@ -63,8 +63,7 @@ You can select a specific database by changing the value of `$redis_database_ind
 
 #### TODO
  - Timeout for DNS lookups and getting rid of `gethostbynam*` functions.
- - Input valiation / sanitization.
- - TXT record.
+ - Support for querying TXT record.
  - Logging.
  - PHP7 compatibility. (Must work by default since we're not using any PHP7-specific features.)
 
