@@ -5,7 +5,9 @@ You can use https://github.com/WyldePointer/libdwrap-php to query this server.
 <br /><br />
 
 ### Using a web server
-Just put the `.php` files in your `public_html/` or `htdocs/` directory. (With `rewrite ^(.*) http://dwrap.local$1 permanent;`)
+Just put the `.php` files in your `public_html/` or `htdocs/` directory.
+
+(nginx rewrite example: `rewrite ^(.*) http://dwrap.local$1 permanent;`)
 
 ### Standalone
 ```
