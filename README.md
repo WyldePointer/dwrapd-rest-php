@@ -4,11 +4,12 @@ A RESTful implementation of dwrapd in PHP.
 You can use https://github.com/WyldePointer/libdwrap-php to query this server.
 <br /><br />
 
-### Using a webserver
-Just put the `.php` files in your `public_html/` or `htdocs/` directory.
+### Using a web server
+Just put the `.php` files in your `public_html/` or `htdocs/` directory. (With `rewrite ^(.*) http://dwrap.local$1 permanent;`)
 
 ### Standalone
 ```
+$ git clone https://github.com/WyldePointer/dwrapd-rest-php.git
 $ cd dwrapd-rest-php
 $ php -S localhost:8000 index.php
 ```
