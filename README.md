@@ -38,4 +38,5 @@ GET http://localhost:8000/get_mx/gmail.com/json/limit/2
  - Timeout for DNS lookups and getting rid of `gethostbynam*` functions.
  - Input valiation / sanitization.
  - TXT record.
+ - Logging.
 
