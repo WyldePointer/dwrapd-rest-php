@@ -17,7 +17,7 @@ $ php -S localhost:8000 index.php
 
 A record:
 ```
-GET http://localhost:8000/get_ip_by_name/www.google.com/json/limit/2
+GET http://localhost:8000/get_a/www.google.com/json/limit/2
 ```
 ```
 ["173.194.44.82","173.194.44.81"]

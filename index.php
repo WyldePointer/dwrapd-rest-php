@@ -40,15 +40,18 @@ $mx_array = array();
 $url = url_to_array();
 
 if (!isset($url[0])){
-  return -1;
+  printf("ERROR_NO_ACTION_SUPPLIED");
+  exit(-1);
 }
 
 if (!isset($url[1])){
-  return -2;
+  printf("ERROR_NO_DOMAIN_SUPPLIED");
+  exit(-2);
 }
 
 if (!dwrapd_is_valid_domain_name($url[1])){
-  return -2;
+  printf("ERROR_INVALID_DOMAIN_NAME");
+  exit(-3);
 }
 
 $json = array_search("json", $url);
@@ -69,9 +72,14 @@ if (isset($url[$limit_index+1])){
 
 }
 
-if ($url[0] == "get_ip_by_name"){
+if ($url[0] == "get_a"){
 
   $lookup_result = dwrapd_do_dns_lookup_a($url[1], $limit);
+
+  if ($lookup_result === false || $lookup_result < 0){
+    printf("ERROR_NO_IP_FOUND");
+    exit(-4);
+  }
 
   if (is_array($lookup_result)){
 
@@ -116,6 +124,11 @@ if ($url[0] == "get_ip_by_name"){
 if ($url[0] == "get_mx"){
 
   $lookup_result = dwrapd_do_dns_lookup_mx($url[1]);
+
+  if ($lookup_result === false || $lookup_result < 0){
+    printf("ERROR_NO_MX_FOUND");
+    exit(-5);
+  }
 
   if (is_array($lookup_result)){
 
