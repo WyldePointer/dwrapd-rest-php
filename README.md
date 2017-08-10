@@ -2,14 +2,12 @@
 A RESTful implementation of dwrapd in PHP.
 
 You can use https://github.com/WyldePointer/libdwrap-php to query this server.
-<br /><br />
+<br />
 
-### Using a web server
+### Deploying using a web server
 Just put the `.php` files in your `public_html/` or `htdocs/` directory.
 
-(nginx rewrite example: `rewrite ^(.*) http://dwrap.local$1 permanent;`)
-
-### Standalone
+### Deploying in standalone mode
 ```
 $ git clone https://github.com/WyldePointer/dwrapd-rest-php.git
 $ cd dwrapd-rest-php
@@ -35,26 +33,32 @@ GET http://localhost:8000/get_mx/gmail.com/json/limit/2
 ```
 
 ### Caching
-In order to enable caching, you need to have a working *Redis server* and the *PHP extension* for accessing it.
+In order to enable the caching, you need to have a working *redis server* and the *PHP extension* for accessing that.
  - https://redis.io/
  - https://github.com/phpredis/phpredis/
 
-Installing via packages in Ubuntu:
+You can also install them via packages but that highly depends on your operating system.
+
+Ubuntu example:
 ```
 # apt-get install redis-server
 # apt-get install php5-redis
 ```
 
 Enable the caching:
+
 `$redis_caching_enabled = true;`
 
 Disable the caching:
+
 `$redis_caching_enabled = false;`
 
 Setting the caching timeout(expire):
+
 `$redis_caching_ttl = 10;` (in seconds)
 
 Note: By default, it uses the default redis database(`index 0`).
+
 You can select a specific database by changing the value of `$redis_database_index` variable.
 
 #### TODO
@@ -62,4 +66,5 @@ You can select a specific database by changing the value of `$redis_database_ind
  - Input valiation / sanitization.
  - TXT record.
  - Logging.
+ - PHP7 compatibility. (Must work by default since we're not using any PHP7-specific features.)
 
