@@ -68,7 +68,7 @@ function dwrapd_do_dns_lookup($hostname, $record='A'){
 
   }
 
-  return 0;
+  return false;
 }
 
 
@@ -76,16 +76,17 @@ function dwrapd_do_dns_lookup_a($hostname, $limit=0){
 
   $ips = NULL;
 
-  /*
-   *  TODO: Timeout for gethostbyname functions.
-   */
   if ($limit == 1){
+
     $ips = gethostbyname($hostname);
+
   }else{
+
     $ips = gethostbynamel($hostname);
+
   }
 
-  return $ips;
+  return ($ips != $hostname) ? $ips : false;
 }
 
 
