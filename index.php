@@ -29,13 +29,20 @@
 require "libdwrapd.php";
 require "functions_misc.php";
 
+$redis_caching_enabled = true;
+$redis_ip_address = "127.0.0.1";
+$redis_tcp_port = 6379;
+$redis_database_index = 0;
+$redis_caching_ttl = 10; /* in seconds */
+
+/* Internal variables. DO NOT change them! */
 $json = false;
 $url_array = NULL;
 $limit = 0;
 $limit_index = 0;
+$record_type_to_lookup = NULL;
 $lookup_result = NULL;
-$ip_array = array();
-$mx_array = array();
+$redis = NULL; /* Instance of redis */
 
 $url = url_to_array();
 
@@ -44,15 +51,33 @@ if (!isset($url[0])){
   exit(-1);
 }
 
+switch ($url[0]){
+
+  case "get_a":
+    $record_type_to_lookup = 'A';
+    break;
+
+  case "get_mx":
+    $record_type_to_lookup = "MX";
+    break;
+
+  default:
+    printf("ERROR_INVALID_ACTION");
+    exit(-2);
+
+}
+
 if (!isset($url[1])){
   printf("ERROR_NO_DOMAIN_SUPPLIED");
-  exit(-2);
+  exit(-3);
 }
 
 if (!dwrapd_is_valid_domain_name($url[1])){
   printf("ERROR_INVALID_DOMAIN_NAME");
-  exit(-3);
+  exit(-4);
 }
+
+
 
 $json = array_search("json", $url);
 
@@ -64,7 +89,7 @@ if ($limit_index){
 }
 
 /* If there was a number next to "limit" in URL */
-if (isset($url[$limit_index+1])){
+if ($limit && isset($url[$limit_index+1])){
 
   if (intval($url[$limit_index+1]) == $url[$limit_index+1]){
     $limit = $url[$limit_index+1];
@@ -72,94 +97,93 @@ if (isset($url[$limit_index+1])){
 
 }
 
-if ($url[0] == "get_a"){
+if ($redis_caching_enabled){
 
-  $lookup_result = dwrapd_do_dns_lookup_a($url[1], $limit);
+  $redis = dwrapd_redis_connect_tcp($redis_ip_address, $redis_tcp_port, $redis_database_index);
 
-  if ($lookup_result === false || $lookup_result < 0){
-    printf("ERROR_NO_IP_FOUND");
-    exit(-4);
-  }
+  if ($redis){
 
-  if (is_array($lookup_result)){
+    $lookup_result = dwrapd_redis_get_records($redis, $url[1], $record_type_to_lookup, $limit);
 
-    foreach ($lookup_result as $ip){
+    if (!$lookup_result){
 
-      if(filter_var($ip, FILTER_VALIDATE_IP)){
-        $ip_array[] = $ip;
+      if ($record_type_to_lookup == 'A'){
+        $lookup_result = dwrapd_do_dns_lookup_a($url[1]);
       }
 
-      if (count($ip_array) >= $limit && $limit > 0){
-        break;
+      if ($record_type_to_lookup == "MX"){
+        $lookup_result = dwrapd_do_dns_lookup_mx($url[1]);
       }
 
-    }
+      if ($lookup_result){
 
-  } else {
+        dwrapd_redis_set_records($redis, $url[1], $record_type_to_lookup, $lookup_result);
 
-    if (!empty($lookup_result)){
-      echo $lookup_result;
-    }
-
-  }
-
-  if (count($ip_array)){
-
-    if ($json){
-
-      echo json_encode($ip_array);
-
-    } else {
-
-      foreach ($ip_array as $ip){
-        echo $ip, "\n";
-      }
-
-    }
-
-  }
-
-}
-
-if ($url[0] == "get_mx"){
-
-  $lookup_result = dwrapd_do_dns_lookup_mx($url[1]);
-
-  if ($lookup_result === false || $lookup_result < 0){
-    printf("ERROR_NO_MX_FOUND");
-    exit(-5);
-  }
-
-  if (is_array($lookup_result)){
-
-    foreach ($lookup_result as $record => $weight){
-
-      $mx_array[$record] = $weight;
-
-      if (count($mx_array) >= $limit && $limit > 0){
-        break;
-      }
-
-    }
-
-    if (count($mx_array)){
-
-      if ($json){
-
-        echo json_encode($mx_array);
+        dwrapd_redis_set_expire($redis, $url[1], $redis_caching_ttl);
 
       } else {
 
-        foreach ($mx_array as $record => $weight){
-          echo $record, ' ', $weight, "\n";
-        }
+        /*
+         * TODO: Marking the domain name as _NOT_FOUND_ in redis
+         *       so we won't lookup again until the cache is expired.
+        */
 
       }
+
+    } else {
+
+      /* TODO: Storing HIT statistics. */
 
     }
 
   }
 
 }
+
+if (!$redis){
+
+    if ($record_type_to_lookup == 'A'){
+      $lookup_result = dwrapd_do_dns_lookup_a($url[1], $limit);
+    }
+
+    if ($record_type_to_lookup == "MX"){
+      $lookup_result = dwrapd_do_dns_lookup_mx($url[1], $limit);
+    }
+
+}
+
+if ($lookup_result === false || $lookup_result < 0){
+
+  if ($record_type_to_lookup == 'A'){
+    printf("ERROR_NO_IP_FOUND");
+  }
+
+  if ($record_type_to_lookup == "MX"){
+    printf("ERROR_NO_MX_FOUND");
+  }
+
+  exit(-5);
+}
+
+if (is_array($lookup_result)){
+
+  if ($record_type_to_lookup == 'A'){
+    display_ips($lookup_result, $json, $limit);
+  }
+
+  if ($record_type_to_lookup == "MX"){
+    display_mx_records($lookup_result, $json, $limit);
+  }
+
+} else {
+
+  /* Case of single A record lookup since gethostbyname() returns string */
+
+  if ($record_type_to_lookup == 'A' || !empty($lookup_result)){
+    echo $lookup_result;
+  }
+
+}
+
 
 return true;

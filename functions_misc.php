@@ -47,4 +47,71 @@ function url_to_array(){
 }
 
 
+function display_ips(array $lookup_result, $json=0, $limit=0){
 
+  $ip_array = array();
+
+  foreach ($lookup_result as $ip){
+
+    if(filter_var($ip, FILTER_VALIDATE_IP)){
+      $ip_array[] = $ip;
+    }
+
+    if (count($ip_array) >= $limit && $limit > 0){
+      break;
+    }
+
+  }
+
+  if (count($ip_array)){
+
+    if ($json){
+
+      echo json_encode($ip_array);
+
+    } else {
+
+      foreach ($ip_array as $ip){
+        echo $ip, "\n";
+      }
+
+    }
+
+  }
+
+  return true;
+}
+
+
+function display_mx_records(array $lookup_result, $json, $limit){
+
+  $mx_array = array();
+
+  foreach ($lookup_result as $record => $weight){
+
+    $mx_array[$record] = $weight;
+
+    if (count($mx_array) >= $limit && $limit > 0){
+      break;
+    }
+
+  }
+
+  if (count($mx_array)){
+
+    if ($json){
+
+      echo json_encode($mx_array);
+
+    } else {
+
+      foreach ($mx_array as $record => $weight){
+        echo $record, ' ', $weight, "\n";
+      }
+
+    }
+
+  }
+
+  return true;
+}

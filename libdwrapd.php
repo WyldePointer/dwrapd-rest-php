@@ -142,3 +142,90 @@ function dwrapd_do_dns_lookup_mx($hostname){
 }
 
 
+function dwrapd_redis_connect_tcp($ip_address, $port=6379, $index=0){
+
+  if (!extension_loaded("redis")){
+    /* TODO: Log "Redis extension is not loaded" */
+    return false;
+  }
+
+  $redis = new Redis();
+
+  if ($redis->connect($ip_address, $port)){
+
+    if ($index === 0){
+      return $redis;
+    }
+
+    if ($redis->select($index)){
+      /* TODO: Log "Cannot select database $index" */
+      return $redis;
+    }
+
+  }
+
+  return false;
+}
+
+
+function dwrapd_redis_get_records(Redis $redis, $hostname, $record_type, $limit=0){
+
+  $record = NULL;
+  $i = 0;
+  $ips_array = array();
+
+  $record = unserialize($redis->get($hostname));
+
+  if (isset($record[$record_type])){
+
+    if ($limit === 0){
+
+      return $record[$record_type];
+
+    } elseif ($limit > 0){
+
+      foreach ($record[$record_type] as $a_record){
+
+        $ips_array[] = $a_record;
+
+        if (++$i >= $limit){
+          break;
+        }
+
+      }
+
+      if (count($ips_array)){
+        return $ips_array;
+      }
+
+    }
+
+  }
+
+  return false;
+}
+
+
+function dwrapd_redis_set_records(Redis $redis, $hostname, $record_type, array $records){
+
+  if ($current = unserialize($redis->get($hostname))){
+
+    $current[$record_type] = $records;
+
+    if ($redis->set($hostname, serialize($current))){
+      return true;
+    }
+
+  } else {
+
+    return $redis->set($hostname, serialize(array($record_type => $records)));
+
+  }
+
+  return false;
+}
+
+
+function dwrapd_redis_set_expire(Redis $redis, $hostname, $ttl){
+  return ($redis->expire($hostname, $ttl)) ? true : false;
+}
