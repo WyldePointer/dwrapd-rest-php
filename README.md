@@ -22,6 +22,7 @@ GET http://localhost:8000/get_ip_by_name/www.google.com/json/limit/2
 ```
 
 #### TODO
+ - Timeout for `gethostbynam*` functions.
  - Input valiation / sanitization.
  - MX & TXT records.
 
