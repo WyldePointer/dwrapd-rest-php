@@ -66,4 +66,6 @@ You can select a specific database by changing the value of `$redis_database_ind
  - Support for querying TXT record.
  - Logging.
  - PHP7 compatibility. (Must work by default since we're not using any PHP7-specific features.)
+ - ACL. (IP / Network)
+ - Authentication. (PKI and/or SSO)
 
