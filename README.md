@@ -35,7 +35,7 @@ GET http://localhost:8000/get_mx/gmail.com/json/limit/2
 ```
 
 #### TODO
- - Timeout for `gethostbynam*` functions.
+ - Timeout for DNS lookups and getting rid of `gethostbynam*` functions.
  - Input valiation / sanitization.
- - MX & TXT records.
+ - TXT record.
 
