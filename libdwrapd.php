@@ -172,7 +172,7 @@ function dwrapd_redis_get_records(Redis $redis, $hostname, $record_type, $limit=
 
   $record = NULL;
   $i = 0;
-  $ips_array = array();
+  $result_array = array();
 
   $record = unserialize($redis->get($hostname));
 
@@ -184,18 +184,36 @@ function dwrapd_redis_get_records(Redis $redis, $hostname, $record_type, $limit=
 
     } elseif ($limit > 0){
 
-      foreach ($record[$record_type] as $a_record){
+      if ($record_type == 'A'){
 
-        $ips_array[] = $a_record;
+        foreach ($record[$record_type] as $a_record){
 
-        if (++$i >= $limit){
-          break;
+          $result_array[] = $a_record;
+
+          if (++$i >= $limit){
+            break;
+          }
+
         }
 
       }
 
-      if (count($ips_array)){
-        return $ips_array;
+      if ($record_type == "MX"){
+
+        foreach ($record[$record_type] as $mx_record => $weight){
+
+          $result_array[$mx_record] = $weight;
+
+          if (++$i >= $limit){
+            break;
+          }
+
+        }
+
+      }
+
+      if (count($result_array)){
+        return $result_array;
       }
 
     }
