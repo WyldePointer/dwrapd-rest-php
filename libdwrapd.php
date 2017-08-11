@@ -116,9 +116,9 @@ function dwrapd_do_dns_lookup_mx($hostname){
 
       foreach ($weights as $key => $value){
 
-        if (dwrapd_is_valid_domain_name($mx_records[$key])){
+        if (isset($mx_records[$key])){
 
-          if (isset($mx_records[$key])){
+          if (dwrapd_is_valid_domain_name($mx_records[$key])){
             $formatted[$mx_records[$key]] = $value;
           }
 
