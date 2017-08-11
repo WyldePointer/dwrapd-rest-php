@@ -33,9 +33,9 @@ $redis_caching_enabled = true;
 $redis_ip_address = "127.0.0.1";
 $redis_tcp_port = 6379;
 $redis_database_index = 0;
-$redis_caching_ttl = 10; /* in seconds */
+$redis_caching_ttl = 600; /* in seconds */
 
-$redis_authoritative_enabled = true;
+$redis_authoritative_enabled = false;
 $redis_authoritative_database_index = 1;
 
 /* Internal variables. DO NOT change them! */
@@ -109,7 +109,6 @@ if ($redis_caching_enabled){
     $lookup_result = dwrapd_redis_get_records($redis, $url[1], $record_type_to_lookup, $limit);
 
     if (!$lookup_result && $redis_authoritative_enabled){
-
 
       if (dwrapd_redis_select_database($redis, $redis_authoritative_database_index)){
 
