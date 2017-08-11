@@ -53,7 +53,7 @@ if (!file_exists($argv[1])){
 }
 
 $record = json_decode(file_get_contents($argv[1]), true);
-die(var_dump($record));
+
 if (!$record){
   printf("Not a valid JSON file.\n");
   return -4;
