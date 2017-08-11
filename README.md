@@ -1,6 +1,8 @@
 # dwrapd-rest-php
 A RESTful implementation of dwrapd in PHP.
 
+Note: This project is under active development and ANYTHING may change at ANYTIME.
+
 You can use https://github.com/WyldePointer/libdwrap-php to query this server.
 <br />
 
@@ -45,6 +47,8 @@ Ubuntu example:
 # apt-get install php5-redis
 ```
 
+*The following configuration parameters are defined in your `index.php` file.*
+
 Enable the caching:
 
 `$redis_caching_enabled = true;`
@@ -60,6 +64,65 @@ Setting the TTL for the cached records:
 Note: By default, it uses the default redis database(`index 0`).
 
 You can select a specific database by changing the value of `$redis_database_index` variable.
+
+
+### Authoritative resolver
+You can enable it by `$redis_authoritative_enabled = true;` in your `index.php` file.
+
+For adding a new record to the local database, you can use the `dwrapd_add_new_record.php` CLI utility, which takes a JSON file as its first argument:
+```
+$ dwrapd_add_new_record.php record_file.json
+```
+
+The JSON file must be structured like:
+```
+{"www.server.local":{"A":["192.168.1.250","192.168.2.250","192.168.3.250"],"MX":{"mail1.local":10,"mail1.server.local":20,"server.local":30}}}
+```
+
+Which is:
+```
+array(1) {
+  ["www.server.local"]=>
+  array(2) {
+    ["A"]=>
+    array(3) {
+      [0]=>
+      string(13) "192.168.1.250"
+      [1]=>
+      string(13) "192.168.2.250"
+      [2]=>
+      string(13) "192.168.3.250"
+    }
+    ["MX"]=>
+    array(3) {
+      ["mail1.local"]=>
+      int(10)
+      ["mail1.server.local"]=>
+      int(20)
+      ["server.local"]=>
+      int(30)
+    }
+  }
+}
+```
+
+And can be made using:
+```
+<?php
+$my_record = array(
+  "www.server.local" => array (
+    'A' => array ("192.168.1.250", "192.168.2.250", "192.168.3.250"),
+    "MX" => array ("mail1.local" => 10, "mail1.server.local" => 20, "server.local" => 30)
+  )
+);
+
+file_put_contents("record_file.json", json_encode($my_record));
+die();
+?>
+```
+
+Note: By default the authoritative records are stored in database `index 1` and if you want, you can change it by `$redis_authoritative_database_index` variable in your `index.php` file.
+
 
 #### TODO
  - Timeout for DNS lookups and getting rid of `gethostbynam*` functions.

@@ -226,6 +226,29 @@ function dwrapd_redis_set_records(Redis $redis, $hostname, $record_type, array $
 }
 
 
+function dwrapd_redis_set_all_records(Redis $redis, $record){
+
+  $domain = key($record);
+  $records = $record[$domain];
+
+  if ($redis->set($domain, serialize($records))){
+    return true;
+  }
+
+  return false;
+}
+
+
 function dwrapd_redis_set_expire(Redis $redis, $hostname, $ttl){
-  return ($redis->expire($hostname, $ttl)) ? true : false;
+  return $redis->expire($hostname, $ttl);
+}
+
+
+function dwrapd_redis_select_database(Redis $redis, $database_index){
+  return $redis->select($database_index);
+}
+
+
+function dwrapd_redis_save_synchronously(Redis $redis){
+  return $redis->save();
 }

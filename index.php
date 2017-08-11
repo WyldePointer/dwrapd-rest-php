@@ -35,6 +35,9 @@ $redis_tcp_port = 6379;
 $redis_database_index = 0;
 $redis_caching_ttl = 10; /* in seconds */
 
+$redis_authoritative_enabled = true;
+$redis_authoritative_database_index = 1;
+
 /* Internal variables. DO NOT change them! */
 $json = false;
 $url_array = NULL;
@@ -104,6 +107,19 @@ if ($redis_caching_enabled){
   if ($redis){
 
     $lookup_result = dwrapd_redis_get_records($redis, $url[1], $record_type_to_lookup, $limit);
+
+    if (!$lookup_result && $redis_authoritative_enabled){
+
+
+      if (dwrapd_redis_select_database($redis, $redis_authoritative_database_index)){
+
+        $lookup_result = dwrapd_redis_get_records($redis, $url[1], $record_type_to_lookup, $limit);
+
+        dwrapd_redis_select_database($redis, $redis_database_index);
+
+      }
+
+    }
 
     if (!$lookup_result){
 
