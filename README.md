@@ -5,6 +5,12 @@ Note: This project is under active development and ANYTHING may change at ANYTIM
 
 You can use https://github.com/WyldePointer/libdwrap-php to query this server.
 <br />
+Or via command-line:
+```
+echo -e "GET /get_mx/gmail.com/json/limit/2 HTTP/1.1\r\nHost: localhost:8000\r\n\r\n" | nc localhost 8000 | tail -n 1; echo
+```
+<br />
+
 
 ### Deploying using a web server
 Just put the `.php` files in your `public_html/` or `htdocs/` directory.
@@ -20,7 +26,7 @@ $ php -S localhost:8000 index.php
 
 A record:
 ```
-GET http://localhost:8000/get_a/www.google.com/json/limit/2
+GET /get_a/www.google.com/json/limit/2
 ```
 ```
 ["173.194.44.82","173.194.44.81"]
@@ -28,7 +34,7 @@ GET http://localhost:8000/get_a/www.google.com/json/limit/2
 
 MX record:
 ```
-GET http://localhost:8000/get_mx/gmail.com/json/limit/2
+GET /get_mx/gmail.com/json/limit/2
 ```
 ```
 {"alt2.gmail-smtp-in.l.google.com":20,"alt4.gmail-smtp-in.l.google.com":40}
