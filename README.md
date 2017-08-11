@@ -131,10 +131,15 @@ Note: By default the authoritative records are stored in database `index 1` and 
 
 
 #### TODO
- - Timeout for DNS lookups and getting rid of `gethostbynam*` functions.
+ - Writing a dedicated PHP extension for the name resolution. (BSD-Licensed)
  - Support for querying TXT record.
  - Logging.
  - PHP7 compatibility. (Must work by default since we're not using any PHP7-specific features.)
  - ACL. (IP / Network)
  - Authentication. (PKI and/or SSO)
 
+
+### Notes on blocking
+The big blocking part of this code is PHP's internal name resolution functions, which are 101% blocking, and to make the situation worse, PHP's `gethostbyname()` is just a wrapper around libc's `gethostbyname()` and/or `getaddrinfo()` which are.. crap!
+
+So for now, you can run your own local `unbound(8)` server. (Which is highly recommended anyways, since it eliminates the need for costly remote DNS lookups.)
